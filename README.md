@@ -12,7 +12,17 @@
 
 ## 使用案例demo：
 
-1. ### 在需要测试的方法加上@Light-Benchmark注解。
+1. ### 引入maven依赖。
+
+   ```xml
+   <dependency>
+     <groupId>com.Light-Benchmark</groupId>
+     <artifactId>Light-Benchmark</artifactId>
+     <version>1.0.0</version>
+   </dependency>
+   ```
+
+2. ### 在需要测试的方法加上@Light-Benchmark注解。
 
    ```java
    @LightBenchmark
@@ -21,7 +31,7 @@
    }
    ```
 
-2. ### 构建启动方法，传入参数，并启动（参数简易版）。
+3. ### 构建启动方法，传入参数，并启动（参数简易版）。
 
    ```java
    public static void main(String[] args) {
@@ -32,7 +42,7 @@
    }
    ```
 
-3. ### 结果:
+4. ### 结果:
 
    ```txt
    ========getUser预热阶段========
@@ -52,6 +62,16 @@ LightBuilder.build()
   .testTimes(1_000_000)// 测试次数，默认为1_000_000,可不填
   .startTest();//开始测试
 ```
+
+| 参数方法        | 说明            | 可选值                           | 值说明                        |
+| --------------- | --------------- | -------------------------------- | ----------------------------- |
+| model           | 指定测试模式    | LightBuilderConstant.OPS         | 测试微秒级别的OPS             |
+|                 |                 | LightBuilderConstant.TIMES       | 测试执行testTimes次数所耗微秒 |
+| clazz           | 指定测试类class | UserService.class                |                               |
+| warmupTestTimes | 预热次数        | 建议不低于500_000次，即50万次    |                               |
+| testTimes       | 正式测试次数    | 建议不低于1_000_000次，即100万次 |                               |
+
+
 
 ## 注意：
 
