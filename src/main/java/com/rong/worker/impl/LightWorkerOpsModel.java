@@ -25,15 +25,23 @@ public class LightWorkerOpsModel extends BaseWorkerService implements LightWorke
     @Override
     public void work(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException {
         System.out.println("========" + method.getName() + "正式开始" + "========");
+        StringBuilder stb = new StringBuilder();
+        stb.append(method.getName());
+        stb.append(":");
 
-        long start = System.nanoTime();
         long count = 0;
         long TIMES = super.testTimes;
+        long start = System.nanoTime();
         while (count <= TIMES) {
             method.invoke(realObj, args);
             count++;
         }
-        System.out.println(method.getName() + ":" + new BigDecimal(TIMES / ((System.nanoTime() - start) / 1e3)).setScale(2, RoundingMode.HALF_UP) + "ops/us");
+        long end = System.nanoTime();//start和end时间得挨在执行方法前后，避免其他因素影响精确时间.
+
+        stb.append(new BigDecimal(TIMES / ((end - start) / super.unit.getUnit())).setScale(2, RoundingMode.HALF_UP));
+        stb.append(super.unit.getUnitStr());
+
+        System.out.println(stb.toString());
     }
 
 }

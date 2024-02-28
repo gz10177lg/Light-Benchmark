@@ -1,6 +1,7 @@
 package com.rong.worker;
 
 import com.rong.annotation.LightBenchmark;
+import com.rong.model.TestTimeUnit;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -14,6 +15,7 @@ public abstract class BaseWorkerService {
     private Class<?> clazz;
     public long warmupTestTimes = 500_000;
     public long testTimes = 1_000_000;
+    public TestTimeUnit unit = TestTimeUnit.NS;
 
     public abstract void work(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException;
 
@@ -21,6 +23,11 @@ public abstract class BaseWorkerService {
 
     public BaseWorkerService clazz(Class<?> clazz) {
         this.clazz = clazz;
+        return this;
+    }
+
+    public BaseWorkerService unit(TestTimeUnit unit) {
+        this.unit = unit;
         return this;
     }
 
@@ -74,13 +81,13 @@ public abstract class BaseWorkerService {
         Object proxyObject = null;
         try {
             proxyObject = createProxyObject();
-        for (Method method : clazz.getMethods()) {
-            if (method.isAnnotationPresent(LightBenchmark.class)) {
-                method.invoke(proxyObject);
+            for (Method method : clazz.getMethods()) {
+                if (method.isAnnotationPresent(LightBenchmark.class)) {
+                    method.invoke(proxyObject);
+                }
             }
-        }
         } catch (Exception e) {
-            throw new RuntimeException("出错啦："+e);
+            throw new RuntimeException("出错啦：" + e);
         }
     }
 }

@@ -56,11 +56,12 @@
 
 ```java
 LightBuilder.build()
-  .model(LightBuilderConstant.OPS)// 指定模式为OPS，必填
-  .clazz(UserService.class)// 指定测试方法所在类，必填
-  .warmupTestTimes(300_000)//	预热次数,默认为500_000,可不填
-  .testTimes(1_000_000)// 测试次数，默认为1_000_000,可不填
-  .startTest();//开始测试
+        .model(LightBuilderConstant.OPS)// 指定模式为OPS，必填
+        .clazz(UserService.class)// 指定测试方法所在类，必填
+        .warmupTestTimes(300_000)//	预热次数,默认为500_000,可不填
+        .testTimes(1_000_000)// 测试次数，默认为1_000_000,可不填
+        .unit(TestTimeUnit.US)// 测试结果单位，秒、毫秒、微秒、纳秒
+        .startTest();//开始测试
 ```
 
 | 参数方法        | 说明            | 可选值                           | 值说明                        |
@@ -70,6 +71,10 @@ LightBuilder.build()
 | clazz           | 指定测试类class | UserService.class                |                               |
 | warmupTestTimes | 预热次数        | 建议不低于500_000次，即50万次    |                               |
 | testTimes       | 正式测试次数    | 建议不低于1_000_000次，即100万次 |                               |
+| unit            | 测试结果单位    | TestTimeUnit.SECOND              | 秒                            |
+|                 |                 | TestTimeUnit.MS                  | 毫秒                          |
+|                 |                 | TestTimeUnit.US                  | 微秒                          |
+|                 |                 | TestTimeUnit.NS                  | 纳秒                          |
 
 
 
