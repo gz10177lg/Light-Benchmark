@@ -74,7 +74,7 @@ LightBuilder.build()
 | unit            | 测试结果单位    | TestTimeUnit.SECOND              | 秒                            |
 |                 |                 | TestTimeUnit.MS                  | 毫秒                          |
 |                 |                 | TestTimeUnit.US                  | 微秒                          |
-|                 |                 | TestTimeUnit.NS                  | 纳秒                          |
+
 
 
 

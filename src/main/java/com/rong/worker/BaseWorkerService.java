@@ -15,7 +15,7 @@ public abstract class BaseWorkerService {
     private Class<?> clazz;
     public long warmupTestTimes = 500_000;
     public long testTimes = 1_000_000;
-    public TestTimeUnit unit = TestTimeUnit.NS;
+    public TestTimeUnit unit = TestTimeUnit.US;
 
     public abstract void work(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException;
 
