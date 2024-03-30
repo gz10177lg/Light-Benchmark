@@ -1,7 +1,7 @@
-package com.rong.model;
+package com.rong.pojo;
 
 public enum TestTimeUnit {
-    SECOND(1e9, " ops/s"), MS(1e6, " ops/ms"), US(1e3, " ops/us");
+    SECOND(1, " ops/s"), MS(1e3, " ops/ms"), US(1e6, " ops/us");
     private double unit;
     private String unitStr;
 

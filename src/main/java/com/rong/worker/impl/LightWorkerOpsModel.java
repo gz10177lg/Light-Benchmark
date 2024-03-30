@@ -1,52 +1,68 @@
 package com.rong.worker.impl;
 
-import com.rong.model.TestTimeUnit;
+import com.rong.builder.v2.LightBuilderJavassistV2;
+import com.rong.pojo.TestTimeUnit;
 import com.rong.worker.BaseWorkerService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.List;
 
-public class LightWorkerOpsModel extends BaseWorkerService {
-    //禁止外部直接找到成员变量
-    private Class<?> clazz;
-    private long warmupTestTimes;
-    private long testTimes;
-    private TestTimeUnit unit;
+public class LightWorkerOpsModel implements BaseWorkerService {
+    private LightBuilderJavassistV2 service;
 
-    @Override
-    public void warmup(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException {
-        System.out.println("========" + method.getName() + "预热阶段" + "========");
-        long count = 0;
-        long TIMES = super.warmupTestTimes;
-        while (count <= TIMES) {
-            method.invoke(realObj, args);
-            count++;
-        }
+    public LightWorkerOpsModel(Class<?> clazz, long warmupTestTimes, long testTimes, TestTimeUnit unit) {
+        this.service = new LightBuilderJavassistV2(clazz, warmupTestTimes, testTimes, unit, this);
     }
 
+    @Override
+    public void workV2() throws Exception {
+        this.service.executeProxyObj();
+    }
 
     @Override
-    public void work(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException {
-        System.out.println("========" + method.getName() + "正式开始" + "========");
+    public String taskBody(String methodName, TestTimeUnit unit) {
+        String body = "        long count = 0;\n" +
+                "        while (!Thread.currentThread().isInterrupted()) {\n" +
+                "        worker." + methodName + "();" +
+                "            count++;\n" +
+                "        }\n" +
+                "System.out.println(new java.math.BigDecimal(count / " + unit.getUnit() + ").setScale(3, java.math.RoundingMode.HALF_UP) + \"" + unit.getUnitStr() + "\");";
+        return body;
+    }
+
+    @Override
+    public String proxyBody(List<String> baseWorkerNameCtClassList, long warmupTestTimes, long testTimes) {
         StringBuilder stb = new StringBuilder();
-        stb.append(method.getName());
-        stb.append(":");
+        for (int i = 0; i < baseWorkerNameCtClassList.size(); i++) {
+            stb.append("System.out.println(\"预热阶段——【").append(baseWorkerNameCtClassList.get(i).replace("$BaseWorkerServiceTask$", "")).append("】\");\n")
+                    .append("System.out.println(\"========start========\");\n")
+                    .append("for(int i=0;i<" + warmupTestTimes + ";i++) {\n")
+                    .append("Thread t").append(i)
+                    .append(" = new Thread(new ")
+                    .append(baseWorkerNameCtClassList.get(i))
+                    .append("(this));\n")
+                    .append("t").append(i).append(".start();")
+                    .append("try {Thread.sleep(1000l);} catch (InterruptedException e) {throw new RuntimeException(e);}\n")
+                    .append("t").append(i).append(".interrupt();}\n")
+                    .append("Thread.sleep(10l);")
+                    .append("System.out.println(\"========end========\");\n\n")
+                    .append("System.out.println();");
 
-        long count = 0;
-        long TIMES = super.testTimes;
-        long start = System.nanoTime();
-        while (count <= TIMES) {
-            method.invoke(realObj, args);
-            count++;
+
+            stb.append("System.out.println(\"正式阶段——【").append(baseWorkerNameCtClassList.get(i).replace("$BaseWorkerServiceTask$", "")).append("】\");\n")
+                    .append("System.out.println(\"========start========\");\n")
+                    .append("for(int i=0;i<" + testTimes + ";i++) {\n")
+                    .append("Thread t").append(i)
+                    .append(" = new Thread(new ")
+                    .append(baseWorkerNameCtClassList.get(i))
+                    .append("(this));\n")
+                    .append("t").append(i).append(".start();")
+                    .append("try {Thread.sleep(1000l);} catch (InterruptedException e) {throw new RuntimeException(e);}\n")
+                    .append("t").append(i).append(".interrupt();}\n")
+                    .append("Thread.sleep(10l);")
+                    .append("System.out.println(\"========end========\");\n\n")
+                    .append("System.out.println();");
         }
-        long end = System.nanoTime();//start和end时间得挨在执行方法前后，避免其他因素影响精确时间.
-
-        stb.append(new BigDecimal(TIMES / ((end - start) / super.unit.getUnit())).setScale(2, RoundingMode.HALF_UP));
-        stb.append(super.unit.getUnitStr());
-
-        System.out.println(stb.toString());
+        return stb.toString();
     }
 
 }

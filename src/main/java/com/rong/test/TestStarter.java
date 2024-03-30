@@ -1,8 +1,8 @@
 package com.rong.test;
 
 import com.rong.builder.LightBuilder;
-import com.rong.builder.LightBuilderConstant;
-import com.rong.model.TestTimeUnit;
+import com.rong.constants.LightBuilderConstant;
+import com.rong.pojo.TestTimeUnit;
 import com.rong.test.model.UserService;
 
 public class TestStarter {
@@ -11,8 +11,8 @@ public class TestStarter {
         LightBuilder.build()
                 .model(LightBuilderConstant.OPS)
                 .clazz(UserService.class)
-                .warmupTestTimes(300_000)
-                .testTimes(1_000_000)
+                .warmupTestTimes(5)
+                .testTimes(5)
                 .unit(TestTimeUnit.US)
                 .startTest();
     }

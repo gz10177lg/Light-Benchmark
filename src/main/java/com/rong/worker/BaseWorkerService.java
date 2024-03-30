@@ -1,60 +1,14 @@
 package com.rong.worker;
 
-import com.rong.annotation.LightBenchmark;
-import com.rong.model.TestTimeUnit;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import com.rong.pojo.TestTimeUnit;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.util.List;
 
-public abstract class BaseWorkerService {
-    public Class<?> clazz;
-    public long warmupTestTimes = 500_000;
-    public long testTimes = 1_000_000;
-    public TestTimeUnit unit = TestTimeUnit.US;
+public interface BaseWorkerService {
+    void workV2() throws Exception;
 
-    public abstract void work(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException;
+    String taskBody(String methodName, TestTimeUnit unit);
 
-    public abstract void warmup(Method method, Object realObj, Object[] args) throws InvocationTargetException, IllegalAccessException;
-
-    public  <T> T createProxyObject() throws InstantiationException, IllegalAccessException {
-        T realObj = (T) clazz.newInstance();
-        T proxyObj;
-
-        if (clazz.getInterfaces().length > 0) {
-            //有接口就用JDK.Proxy
-            proxyObj = (T) Proxy.newProxyInstance(
-                    clazz.getClassLoader(),
-                    clazz.getInterfaces(),
-                    new InvocationHandler() {
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            if (method.isAnnotationPresent(LightBenchmark.class)) {
-                                warmup(method, realObj, args);
-                                work(method, realObj, args);
-                            }
-                            return null;
-                        }
-                    }
-            );
-        } else {
-            //没有接口就用Cglib
-            proxyObj = (T) Enhancer.create(clazz, new MethodInterceptor() {
-                @Override
-                public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-                    if (method.isAnnotationPresent(LightBenchmark.class)) {
-                        warmup(method, realObj, objects);
-                        work(method, realObj, objects);
-                    }
-                    return null;
-                }
-            });
-        }
-        return proxyObj;
-    }
+    String proxyBody(List<String> baseWorkerNameCtClassList, long warmupTestTimes, long testTimes);
 
 }

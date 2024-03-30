@@ -1,4 +1,4 @@
-package com.rong.builder;
+package com.rong.constants;
 
 public class LightBuilderConstant {
         public final static int OPS = 1;
