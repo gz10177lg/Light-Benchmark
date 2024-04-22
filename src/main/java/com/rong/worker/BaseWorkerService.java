@@ -11,4 +11,8 @@ public interface BaseWorkerService {
 
     String proxyBody(List<String> baseWorkerNameCtClassList, long warmupTestTimes, long testTimes);
 
+    String taskBodyAsync(String methodName);
+
+    String proxyBodyAsync(int threads, long testTimes, long warmUpTimes, String ctClassTaskAllOf, List<String> workerClassName);
+
 }

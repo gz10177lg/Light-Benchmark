@@ -14,6 +14,7 @@ public class TestStarter {
                 .warmupTestTimes(5)
                 .testTimes(5)
                 .unit(TestTimeUnit.US)
+                .threads(4)
                 .startTest();
     }
 }

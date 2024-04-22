@@ -11,6 +11,7 @@ public class LightBuilder {
     private long warmupTestTimes = 5;
     private long testTimes = 5;
     private TestTimeUnit unit = TestTimeUnit.US;
+    private int threads = 1;
     private BaseWorkerService service;
 
     public static LightBuilder build() {
@@ -29,6 +30,11 @@ public class LightBuilder {
 
     public LightBuilder unit(TestTimeUnit unit) {
         this.unit = unit;
+        return this;
+    }
+
+    public LightBuilder threads(int threads) {
+        this.threads = threads;
         return this;
     }
 
@@ -65,12 +71,12 @@ public class LightBuilder {
     private void buildServiceWork() {
         switch (this.model) {
             case 1:
-                this.service = new LightWorkerOpsModel(clazz, warmupTestTimes, testTimes, unit);
+                this.service = new LightWorkerOpsModel(clazz, warmupTestTimes, testTimes, unit, threads);
                 break;
             case 2:
                 break;
             default:
-                this.service = new LightWorkerOpsModel(clazz, warmupTestTimes, testTimes, unit);
+                this.service = new LightWorkerOpsModel(clazz, warmupTestTimes, testTimes, unit, threads);
         }
     }
 
